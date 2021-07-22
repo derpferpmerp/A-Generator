@@ -9,7 +9,8 @@ import math
 # Value = 1 (Wall)
 # Value = 2 (End Position)
 # Value = 3 (Start Position)
-
+if "-h" in sys.argv[1::]:
+	sys.exit("-h: Help\n-d=NUM [Density Variable]\n-v [Verbose Mode]\n-w=NUM [Width of Grid]")
 def gen_rand_grid(d, density=1):
 	try:
 		grid = np.zeros((d, d), int)
@@ -48,6 +49,7 @@ def remove_dup(original_list):
 # CONFIG
 w_val=6
 verbose=False
+density = 2
 for sysarg in sys.argv[1::]:
 	if "-m" in sysarg:
 		maxv = int(sysarg.replace("-m=",""))
@@ -55,8 +57,10 @@ for sysarg in sys.argv[1::]:
 		w_val = int(sysarg.replace("-w=",""))
 	if "-v" in sysarg:
 		verbose=True
+	if "-d" in sysarg:
+		density = float(sysarg.replace("-d=",""))
 
-grd = gen_rand_grid(w_val, density=2)
+grd = gen_rand_grid(w_val, density=density)
 #xs,ys = rPos(grd,0)
 xs,ys = rPos(grd,0)
 xe,ye = [0,0]
