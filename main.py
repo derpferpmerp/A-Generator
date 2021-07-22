@@ -47,12 +47,14 @@ def remove_dup(original_list):
 
 # CONFIG
 w_val=6
-
+verbose=False
 for sysarg in sys.argv[1::]:
 	if "-m" in sysarg:
 		maxv = int(sysarg.replace("-m=",""))
 	if "-w" in sysarg:
 		w_val = int(sysarg.replace("-w=",""))
+	if "-v" in sysarg:
+		verbose=True
 
 grd = gen_rand_grid(w_val, density=2)
 #xs,ys = rPos(grd,0)
@@ -60,7 +62,6 @@ xs,ys = rPos(grd,0)
 xe,ye = [0,0]
 grd[xe,ye]=2
 grd[xs,ys]=3
-verbose = any([[True if x == "-v" else False] for x in sys.argv[1::]])
 # END CONFIG
 
 def recursive_perms(chrstart,chrend,arr,pcoords=False,initial=False,cllist=False):
