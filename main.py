@@ -1,7 +1,8 @@
-import numpy as np
-import random
-import sys
 import math
+import random
+import re
+import sys
+import numpy as np
 
 
 # Coords
@@ -62,8 +63,8 @@ for sysarg in sys.argv[1::]:
 
 grd = gen_rand_grid(w_val, density=density)
 #xs,ys = rPos(grd,0)
-xs,ys = rPos(grd,0)
-xe,ye = [0,0]
+xs,ys = [0,0]
+xe,ye = rPos(grd,0)
 grd[xe,ye]=2
 grd[xs,ys]=3
 # END CONFIG
@@ -106,6 +107,42 @@ def recursive_perms(chrstart,chrend,arr,pcoords=False,initial=False,cllist=False
 			continue
 	return out
 
+def rec_pattern(arr,char=0,mn=3):
+	flist = []
+	for h_iter in range(round(math.sqrt(arr.size))):
+		hlist = []
+		for w_iter in range(round(math.sqrt(arr.size))):
+			hlist.append(arr[h_iter,w_iter])
+		flist.append(hlist)
+	vertout = []
+	for vert in range(len(flist)):
+		vertout.append(list(list(zip(*flist))[vert]))
+	horizontalcombd = [gg for gg in ["".join(str(g) for g in x) for x in flist]]
+	vertcombd = [gg for gg in ["".join(str(g) for g in x) for x in vertout]]
+	ol = {"Values":[]}
+	for itr in range(len(horizontalcombd)):
+		try:
+			horizontalperms = re.search("".join([str(char) for x in range(mn)]), str(horizontalcombd[itr])).span()
+			ol["Values"].append([[itr,horizontalperms[0]],[itr,horizontalperms[1]]])
+		except AttributeError:
+			pass
+	for itr in range(len(vertcombd)):
+		try:
+			vertperms = re.search("".join([str(char) for x in range(mn)]), str(vertcombd[itr])).span()
+			ol["Values"].append([[itr,vertperms[0]],[itr,vertperms[1]]])
+		except AttributeError:
+			pass
+	fout = []
+	for fv in ol["Values"]:
+		diffx, diffy = [abs(fv[0][0] - fv[1][0]), abs(fv[0][1] - fv[1][1])]
+		if diffy > 0:
+			fout.append([[fv[0][0],x] for x in range(fv[0][1],fv[1][1])])
+		elif diffx > 0:
+			fout.append([[x,fv[0][1]] for x in range(fv[0][0],fv[1][0])])
+	return fout
+
+
+
 crddone = []
 vals = []
 try:
@@ -122,8 +159,10 @@ for x in range(round(math.sqrt(w_val)+4)):
 	done=False
 	for crd2, val2 in recursive_perms(3,2,grd,initial=False,cllist=crddone):
 		if val2 == 3:
-			sys.exit(grd)
-			done=True
+			strout = rec_pattern(grd)
+			print(grd)
+			sys.exit(str(strout))
+			#done=True
 		if crd2 not in crddone:
 			crddone.append(crd2)
 	if done:
