@@ -3,7 +3,7 @@ import random
 import re
 import sys
 import numpy as np
-
+from test import maze as genrd
 
 # Coords
 # Value = 0 (None)
@@ -12,14 +12,19 @@ import numpy as np
 # Value = 3 (Start Position)
 if "-h" in sys.argv[1::]:
 	sys.exit("-h: Help\n-d=NUM [Density Variable]\n-v [Verbose Mode]\n-w=NUM [Width of Grid]")
-def gen_rand_grid(d, density=1):
-	try:
-		grid = np.zeros((d, d), int)
-		choices = np.random.choice(grid.size,random.randrange(round((3 / 4) * d * density), d * density), replace=False)
-		grid.ravel()[choices] = 1
-		return grid
-	except ValueError:
-		return None
+def gen_rand_grid(d, density=1, opt="NICE"):
+	if opt == "RANDOM":
+		try:
+			grid = np.zeros((d, d), int)
+			choices = np.random.choice(grid.size,random.randrange(round((3 / 4) * d * density), d * density), replace=False)
+			grid.ravel()[choices] = 1
+			return grid
+		except ValueError:
+			return None
+	else:
+		return genrd(width=d,height=d,density=round(3/4 * d) * density)
+
+	
 
 def get_bounds(x1,y1,arr,jcoords=False):
 	dctout = {}
@@ -51,6 +56,7 @@ def remove_dup(original_list):
 w_val=6
 verbose=False
 density = 2
+rndm="NICE"
 for sysarg in sys.argv[1::]:
 	if "-m" in sysarg:
 		maxv = int(sysarg.replace("-m=",""))
@@ -60,10 +66,12 @@ for sysarg in sys.argv[1::]:
 		verbose=True
 	if "-d" in sysarg:
 		density = float(sysarg.replace("-d=",""))
+	if "-r" in sysarg:
+		rndm = "RANDOM"
 
-grd = gen_rand_grid(w_val, density=density)
+grd = gen_rand_grid(w_val, density=density, opt=rndm)
 #xs,ys = rPos(grd,0)
-xs,ys = [0,0]
+xs,ys = [1,1]
 xe,ye = rPos(grd,0)
 grd[xe,ye]=2
 grd[xs,ys]=3
