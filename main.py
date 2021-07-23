@@ -3,7 +3,7 @@ import random
 import re
 import sys
 import numpy as np
-from test import maze as genrd
+from tools import maze as genrd
 
 # Coords
 # Value = 0 (None)
@@ -11,8 +11,8 @@ from test import maze as genrd
 # Value = 2 (End Position)
 # Value = 3 (Start Position)
 if "-h" in sys.argv[1::]:
-	sys.exit("-h: Help\n-d=NUM [Density Variable]\n-v [Verbose Mode]\n-w=NUM [Width of Grid]")
-def gen_rand_grid(d, density=1, opt="NICE"):
+	sys.exit("-h: Help\n-d=NUM [Density Variable]\n-v [Verbose Mode]\n-w=NUM [Width of Grid]\n-r [Switch to Random Maze Generation]\n-c=NUM [Complexity Variable]")
+def gen_rand_grid(d, density=1, opt="NICE", cmp=0.75):
 	if opt == "RANDOM":
 		try:
 			grid = np.zeros((d, d), int)
@@ -22,8 +22,10 @@ def gen_rand_grid(d, density=1, opt="NICE"):
 		except ValueError:
 			return None
 	else:
-		return genrd(width=d,height=d,density=round(3/4 * d) * density)
+		return genrd(width=d,height=d,density=round(3/4 * d) * density,complexity=cmp)
 
+def distance(x1,y1,x2,y2):
+	return round(math.sqrt(abs(x2-x1)**2 + abs(y2-y1)**2))
 	
 
 def get_bounds(x1,y1,arr,jcoords=False):
@@ -45,6 +47,13 @@ def rPos(arr,seek,allcoords=False):
 		return [list(x) for x in coords]
 	return list(coords[random.randrange(0,len(coords)-1)])
 
+def gen_ending_coords(arr,sx,sy,seek=0):
+	dcoords, ddist = [[],[]]
+	for x,y in [list(g) for g in list(zip(*np.nonzero(arr == seek)))]:
+		dcoords.append([x,y])
+		ddist.append(distance(x,y,sx,sy))
+	maxval = dcoords[ddist.index(max(ddist))]
+	return maxval
 def remove_dup(original_list):
 	lst2 = []
 	for x in original_list:
@@ -57,6 +66,7 @@ w_val=6
 verbose=False
 density = 2
 rndm="NICE"
+comp = 0.75
 for sysarg in sys.argv[1::]:
 	if "-m" in sysarg:
 		maxv = int(sysarg.replace("-m=",""))
@@ -68,15 +78,20 @@ for sysarg in sys.argv[1::]:
 		density = float(sysarg.replace("-d=",""))
 	if "-r" in sysarg:
 		rndm = "RANDOM"
+	if "-c" in sysarg:
+		comp = float(sysarg.replace("-c=",""))
+		if comp > 1 or comp < 0:
+			comp = 0.75
 
-grd = gen_rand_grid(w_val, density=density, opt=rndm)
+grd = gen_rand_grid(w_val, density=density, opt=rndm, cmp=comp)
 #xs,ys = rPos(grd,0)
 xs,ys = [1,1]
-xe,ye = rPos(grd,0)
+xe,ye = gen_ending_coords(grd,xs,ys)
 grd[xe,ye]=2
 grd[xs,ys]=3
 # END CONFIG
-
+if "-N" in sys.argv[1::]:
+	sys.exit(grd)
 def recursive_perms(chrstart,chrend,arr,pcoords=False,initial=False,cllist=False):
 	if initial:
 		cl = rPos(arr,chrend,allcoords=True)
@@ -160,7 +175,7 @@ try:
 except UnboundLocalError:
 	pass
 dctstages = {}
-for x in range(round(math.sqrt(w_val)+4)):
+for x in range(round(w_val*4)):
 	if verbose:
 		sys.stdout.write(f"Checking Generation {x}\r")
 		sys.stdout.flush()
