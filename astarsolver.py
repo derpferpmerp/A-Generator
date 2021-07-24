@@ -217,6 +217,7 @@ for x in range(round(w_val*4)):
 			strout = rec_pattern(grd)
 			print(grd)
 			sys.exit(str(strout))
+			#done=True
 		if crd2 not in crddone:
 			crddone.append(crd2)
 	if done:
