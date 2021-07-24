@@ -1,10 +1,11 @@
 import numpy as np
 from numpy.random import randint as rnd
- 
-def maze(width=81, height=51, complexity=.75, density =.75, b=False):
+import matplotlib.pyplot as plt
+import subprocess
+def maze(width=81, height=51, complexity=.75, density =.75, b=False, bl=False):
     # Only odd shapes
 		if b:
-			shape = ((height//2)*2+1, (width//2)*2+1)
+			shape = ((height//2)*2, (width//2)*2)
 		else:
 			shape = ((height//2)*2, (width//2)*2)
     # Adjust complexity and density relative to maze size
@@ -31,10 +32,15 @@ def maze(width=81, height=51, complexity=.75, density =.75, b=False):
 										Z[y_,x_] = 1
 										Z[y_+(y-y_)//2, x_+(x-x_)//2] = 1
 										x, y = x_, y_
-		return 1 * Z
- 
-#plt.figure(figsize=(10,5))
-#plt.imshow(maze(80,40),cmap=plt.cm.binary,interpolation='nearest')
-#plt.xticks([]),plt.yticks([])
-#plt.show()
-#print(maze(width=5,height=10))
+		return [1 * Z if not bl else Z][0]
+
+def gen_maze_img(w=15,h=15,c=0.75,d=0.75,brdr=True,m=0.5,bl2=True,grid=False):
+	plt.figure(figsize=(w,h))
+	if type(grid) == type(True):
+		mzgenned = maze(width=w,height=h,complexity=c,density=d,b=brdr,bl=bl2)
+	else:
+		mzgenned = grid
+	plt.imshow(mzgenned,cmap=plt.cm.binary,interpolation='nearest')
+	plt.xticks([]),plt.yticks([])
+	plt.savefig("lvl.png")
+	return mzgenned * 1

@@ -4,6 +4,7 @@ import re
 import sys
 import numpy as np
 from tools import maze as genrd
+from tools import gen_maze_img as gmi
 
 # Coords
 # Value = 0 (None)
@@ -26,7 +27,11 @@ def gen_rand_grid(d, density=1, opt="NICE", cmp=0.75):
 
 def distance(x1,y1,x2,y2):
 	return round(math.sqrt(abs(x2-x1)**2 + abs(y2-y1)**2))
-	
+
+def gen_current_level(width, dens=0.75, cmp=0.75, border=True, grid=False):
+	return gmi(c=cmp,w=width,h=width,d=dens,brdr=border,m=0.5,bl2=True,grid=grid)
+
+
 
 def get_bounds(x1,y1,arr,jcoords=False):
 	dctout = {}
@@ -61,8 +66,16 @@ def remove_dup(original_list):
 			lst2.append(x)
 	return lst2
 
+
+
+
+
+
+
+
+
 # CONFIG
-w_val=6
+w_val=10
 verbose=False
 density = 2
 rndm="NICE"
@@ -83,15 +96,34 @@ for sysarg in sys.argv[1::]:
 		if comp > 1 or comp < 0:
 			comp = 0.75
 
+
+
+
+
+
 grd = gen_rand_grid(w_val, density=density, opt=rndm, cmp=comp)
+#print(gen_current_level(w_val,dens=density,cmp=comp,border=True,grid=grd))
+
 #xs,ys = rPos(grd,0)
 xs,ys = [1,1]
 xe,ye = gen_ending_coords(grd,xs,ys)
 grd[xe,ye]=2
 grd[xs,ys]=3
 # END CONFIG
+print(gen_current_level(w_val,dens=density,cmp=comp,border=True,grid=grd))
+
 if "-N" in sys.argv[1::]:
 	sys.exit(grd)
+
+
+
+
+
+
+
+
+
+
 def recursive_perms(chrstart,chrend,arr,pcoords=False,initial=False,cllist=False):
 	if initial:
 		cl = rPos(arr,chrend,allcoords=True)
