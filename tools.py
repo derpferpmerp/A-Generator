@@ -1,7 +1,8 @@
 import numpy as np
 from numpy.random import randint as rnd
 import matplotlib.pyplot as plt
-import subprocess
+from matplotlib import colors
+
 def maze(width=81, height=51, complexity=.75, density =.75, b=False, bl=False):
     # Only odd shapes
 		if b:
@@ -36,11 +37,14 @@ def maze(width=81, height=51, complexity=.75, density =.75, b=False, bl=False):
 
 def gen_maze_img(w=15,h=15,c=0.75,d=0.75,brdr=True,m=0.5,bl2=True,grid=False):
 	plt.figure(figsize=(w,h))
+	cmap = colors.ListedColormap(['black', 'white','#39ff14',"red"])
+	bounds=[0,0.9,1.9,2.9,3.9]
+	norm = colors.BoundaryNorm(bounds, cmap.N)
 	if type(grid) == type(True):
 		mzgenned = maze(width=w,height=h,complexity=c,density=d,b=brdr,bl=bl2)
 	else:
 		mzgenned = grid
-	plt.imshow(mzgenned,cmap=plt.cm.binary,interpolation='nearest')
+	plt.imshow(mzgenned,cmap=cmap,norm=norm,interpolation='nearest')
 	plt.xticks([]),plt.yticks([])
 	plt.savefig("lvl.png")
 	return mzgenned * 1
